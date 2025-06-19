@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const upload = require("../middleware/upload");
-const { detectNearbyFacilities, logCrashReport } = require("../services/alertService");
+const { detectNearbyFacilities, logCrashReport } = require("../Services/alertService");
 
 // Gunakan middleware upload langsung sebagai fungsi
 router.post("/upload", 
