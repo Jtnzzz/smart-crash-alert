@@ -5,7 +5,7 @@ const mime = require('mime-types');
 const connectDB = require('./db');
 const hospitalRoutes = require('./routes/hospitals');
 const policeRoutes = require('./routes/police');
-const fireStationRoutes = require('./routes/fireStation');
+const fireStationRoutes = require('./routes/firestation');
 const crashRoutes = require('./routes/Crash');
 const upload = require('./middleware/upload'); // middleware multer
 require('dotenv').config();
