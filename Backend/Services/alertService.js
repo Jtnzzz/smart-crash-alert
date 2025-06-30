@@ -4,7 +4,7 @@ const FireStation = require("../models/fireStation");
 const CrashReport = require("../models/crashReport");
 const { sendCrashNotification } = require("../Services/whatssappService");
 
-// 🔍 Deteksi fasilitas terdekat
+// 🔍 Deteksi maksimal 2 fasilitas terdekat per jenis
 exports.detectNearbyFacilities = async (coordinates) => {
   const [hospitals, police, damkar] = await Promise.all([
     Hospital.find({
@@ -14,7 +14,8 @@ exports.detectNearbyFacilities = async (coordinates) => {
           $maxDistance: 5000
         }
       }
-    }),
+    }).limit(2), // Maksimal 2 rumah sakit
+
     PoliceStation.find({
       koordinat: {
         $near: {
@@ -22,7 +23,8 @@ exports.detectNearbyFacilities = async (coordinates) => {
           $maxDistance: 5000
         }
       }
-    }),
+    }).limit(2), // Maksimal 2 kantor polisi
+
     FireStation.find({
       koordinat: {
         $near: {
@@ -30,13 +32,13 @@ exports.detectNearbyFacilities = async (coordinates) => {
           $maxDistance: 5000
         }
       }
-    })
+    }).limit(2) // Maksimal 2 damkar
   ]);
 
   return [...hospitals, ...police, ...damkar];
 };
 
-// 🧾 Simpan laporan kecelakaan
+// 🧾 Simpan laporan kecelakaan dan kirim notifikasi
 exports.logCrashReport = async (coordinates, facilities, files = [], jenisKecelakaan = null) => {
   const reportData = {
     coordinates,
@@ -47,7 +49,6 @@ exports.logCrashReport = async (coordinates, facilities, files = [], jenisKecela
     }))
   };
 
-  // Simpan ke database MongoDB
   const report = await CrashReport.create(reportData);
 
   // Kirim notifikasi WhatsApp
@@ -59,3 +60,4 @@ exports.logCrashReport = async (coordinates, facilities, files = [], jenisKecela
 
   return report;
 };
+
