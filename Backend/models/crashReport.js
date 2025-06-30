@@ -1,13 +1,18 @@
+// models/CrashReport.js
 const mongoose = require("mongoose");
 
 const crashReportSchema = new mongoose.Schema({
   coordinates: {
     type: [Number],
-    required: true
+    required: false, // bisa tidak dikirim
+  },
+  jenisKecelakaan: {
+    type: String,
+    required: false, // optional juga
   },
   timestamp: {
     type: Date,
-    default: Date.now
+    default: Date.now,
   },
   respondedFacilities: [{
     facilityType: {
@@ -23,8 +28,6 @@ const crashReportSchema = new mongoose.Schema({
   }]
 });
 
-// Tambahkan indeks untuk pencarian
 crashReportSchema.index({ timestamp: -1 });
-crashReportSchema.index({ "respondedFacilities.facilityType": 1 });
 
 module.exports = mongoose.model("CrashReport", crashReportSchema);
