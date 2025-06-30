@@ -4,41 +4,44 @@ const FireStation = require("../models/fireStation");
 const CrashReport = require("../models/crashReport");
 const { sendCrashNotification } = require("../Services/whatssappService");
 
-// 🔍 Deteksi maksimal 2 fasilitas terdekat per jenis
+// 🔍 Deteksi hanya 1 fasilitas terdekat per jenis
 exports.detectNearbyFacilities = async (coordinates) => {
-  const [hospitals, police, damkar] = await Promise.all([
-    Hospital.find({
-      koordinat: {
-        $near: {
-          $geometry: { type: "Point", coordinates },
-          $maxDistance: 5000
-        }
+  const [hospital] = await Hospital.find({
+    koordinat: {
+      $near: {
+        $geometry: { type: "Point", coordinates },
+        $maxDistance: 5000 // 5 km
       }
-    }).limit(2), // Maksimal 2 rumah sakit
+    }
+  }).limit(1);
 
-    PoliceStation.find({
-      koordinat: {
-        $near: {
-          $geometry: { type: "Point", coordinates },
-          $maxDistance: 5000
-        }
+  const [police] = await PoliceStation.find({
+    koordinat: {
+      $near: {
+        $geometry: { type: "Point", coordinates },
+        $maxDistance: 5000
       }
-    }).limit(2), // Maksimal 2 kantor polisi
+    }
+  }).limit(1);
 
-    FireStation.find({
-      koordinat: {
-        $near: {
-          $geometry: { type: "Point", coordinates },
-          $maxDistance: 5000
-        }
+  const [damkar] = await FireStation.find({
+    koordinat: {
+      $near: {
+        $geometry: { type: "Point", coordinates },
+        $maxDistance: 5000
       }
-    }).limit(2) // Maksimal 2 damkar
-  ]);
+    }
+  }).limit(1);
 
-  return [...hospitals, ...police, ...damkar];
+  const result = [];
+  if (hospital) result.push(hospital);
+  if (police) result.push(police);
+  if (damkar) result.push(damkar);
+
+  return result;
 };
 
-// 🧾 Simpan laporan kecelakaan dan kirim notifikasi
+// 🧾 Simpan laporan kecelakaan
 exports.logCrashReport = async (coordinates, facilities, files = [], jenisKecelakaan = null) => {
   const reportData = {
     coordinates,
