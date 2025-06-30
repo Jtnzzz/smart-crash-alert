@@ -2,7 +2,7 @@
 const express = require("express");
 const router = express.Router();
 const upload = require("../middleware/upload");
-const { detectNearbyFacilities, logCrashReport } = require("../services/alertService");
+const { detectNearbyFacilities, logCrashReport } = require("../Services/alertService");
 
 router.post("/upload", 
   upload,
