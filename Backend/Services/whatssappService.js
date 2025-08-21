@@ -21,45 +21,15 @@ async function sendCrashNotification(coordinates, facilities, files = []) {
                     `🕒 Waktu: ${new Date().toLocaleString()}\n` +
                     `📎 Bukti:\n${fileLinks}\n\n` +
                     `_Dilaporkan melalui Smart Crash Alert System_`;
-
-    // Array nomor WhatsApp yang akan menerima notifikasi (comma-separated)
-    const recipients = process.env.WHATSAPP_RECIPIENTS 
-      ? process.env.WHATSAPP_RECIPIENTS.split(',').map(num => num.trim()).filter(Boolean)
-      : [];
-
-    const responses = [];
     
-    // Kirim pesan ke setiap nomor
-    for (const recipient of recipients) {
-      try {
-        const response = await client.messages.create({
-          body: message,
-          from: 'whatsapp:+14155238886', // Nomor Twilio sandbox
-          to: `whatsapp:${recipient}`
-        });
-        
-        console.log(`📱 WhatsApp notification sent to ${recipient}: ${response.sid}`);
-        responses.push({
-          recipient,
-          sid: response.sid,
-          status: 'sent'
-        });
-        
-        // Delay 1 detik antar pengiriman untuk menghindari rate limiting
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-      } catch (error) {
-        console.error(`🚨 Failed to send WhatsApp to ${recipient}:`, error.message);
-        responses.push({
-          recipient,
-          error: error.message,
-          status: 'failed'
-        });
-      }
-    }
+    const response = await client.messages.create({
+      body: message,
+      from: 'whatsapp:+14155238886', // Nomor Twilio sandbox
+      to: `whatsapp:${process.env.WHATSAPP_RECIPIENT}`
+    });
     
-    return responses;
-    
+    console.log(`📱 WhatsApp notification sent: ${response.sid}`);
+    return response;
   } catch (error) {
     console.error('🚨 WhatsApp API error:', error);
     throw error;
